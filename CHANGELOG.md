@@ -8,7 +8,7 @@ The format is based on Keep a Changelog principles.
 
 ### Added
 
-- Added Lab 5 UI guide at `labs/lab-5-ui/2-core-guided.md`.
+- Added Lab 5 UI guide at `labs/lab-5-ui/lab-5_readme.md`.
 - Added new UI project `src/WorkshopLab.ChatUI` to the solution.
 - Added screenshot automation scripts:
   - `scripts/capture-ui-chrome.mjs`
