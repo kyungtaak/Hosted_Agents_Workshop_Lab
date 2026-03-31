@@ -79,12 +79,12 @@ Use the labs in order. Each one builds on the previous one.
 
 | Lab | Focus | What You Finish With |
 | --- | --- | --- |
-| Lab 0 | Foundry setup | A working local hosted agent and a validated `/responses` endpoint |
-| Lab 1 | Copilot config | Repo-specific Copilot guidance for this hosted-agent project |
-| Lab 2 | Implementation shape | A real feature change in one of the agent's deterministic tools |
-| Lab 3 | CI | Build, test, and container validation in GitHub Actions |
-| Lab 4 | Deploy | Azure-ready packaging plus the deployment handoff steps |
-| Lab 5 | UI | A working chat UI that calls your deployed hosted agent |
+| [Lab 0](labs/lab-0-foundry-setup/lab-0_readme.md) | Foundry setup | A working local hosted agent and a validated `/responses` endpoint |
+| [Lab 1](labs/lab-1-copilot-config/lab-1_readme.md) | Copilot config | Repo-specific Copilot guidance for this hosted-agent project |
+| [Lab 2](labs/lab-2-implementation-shape/lab-2_readme.md) | Implementation shape | A real feature change in one of the agent's deterministic tools |
+| [Lab 3](labs/lab-3-ci/lab-3_readme.md) | CI | Build, test, and container validation in GitHub Actions |
+| [Lab 4](labs/lab-4-deploy/lab-4_readme.md) | Deploy | Azure-ready packaging plus the deployment handoff steps |
+| [Lab 5](labs/lab-5-ui/lab-5_readme.md) | UI | A working chat UI that calls your deployed hosted agent |
 
 For the full lab guide, see [labs/README.md](labs/README.md).
 
