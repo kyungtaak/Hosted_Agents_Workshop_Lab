@@ -2,7 +2,7 @@
 
 This repository is a beginner-friendly workshop for building a Microsoft Foundry Hosted Agent with .NET 10.
 
-If you are new to Foundry hosted agents, follow the labs in order from Lab 0 to Lab 5. Each lab builds on the previous lab and keeps commands copy-paste ready.
+If you are new to Microsoft Foundry hosted agents, follow the labs in order from Lab 0 to Lab 5. Each lab builds on the previous lab and keeps commands copy-paste ready.
 
 The scenario is a **Hosted Agent Readiness Coach**. The agent helps delivery teams answer practical questions such as:
 
@@ -29,7 +29,7 @@ This repository demonstrates three distinct stages:
 - Azure resource provisioning and image publishing for deployment readiness
 - Microsoft Foundry control-plane deployment as an explicit separate step
 
-That split is intentional. `azd` provisions the Azure resource group and Azure Container Registry, GitHub Actions can publish the agent image to ACR, and the final Foundry agent create or update step remains explicit because it depends on your real project endpoint, manifest values, and hosted-agent lifecycle controls.
+That split is intentional. `azd` provisions the Azure resource group and Azure Container Registry, GitHub Actions can publish the agent image to ACR, and the final Microsoft Foundry agent create or update step remains explicit because it depends on your real project endpoint, manifest values, and hosted-agent lifecycle controls.
 
 ## What You Build
 
@@ -49,7 +49,7 @@ Before working through the workshop, make sure you have the accounts, access, an
 
 - An Azure subscription. A trial subscription is fine if it can create and use Microsoft Foundry resources, or you can bring your own subscription.
 - Permission to sign in with Azure CLI and Azure Developer CLI using the account that will run the workshop.
-- Sufficient Azure access to the target subscription and resource group. At minimum, you should be able to provision workshop resources, use the Foundry project endpoint, and deploy or use a chat model.
+- Sufficient Azure access to the target subscription and resource group. At minimum, you should be able to provision workshop resources, use the Microsoft Foundry project endpoint, and deploy or use a chat model.
 - A GitHub account, since the later labs use repository workflows and GitHub Actions.
 - Permission to create or update GitHub Actions workflows and repository settings in the repo used for the workshop.
 
@@ -70,7 +70,7 @@ If this is your first time with hosted agents, use this simple path:
 
 1. Complete Lab 0 and confirm `/responses` works locally.
 2. Complete Labs 1 to 3 and make sure tests and CI pass.
-3. Complete Lab 4 to deploy and verify your hosted agent in Foundry.
+3. Complete Lab 4 to deploy and verify your hosted agent in Microsoft Foundry.
 4. Complete Lab 5 to use the deployed agent through a UI.
 
 ## Course Map: Quick Navigation by Chapter
@@ -79,7 +79,7 @@ Use the labs in order. Each one builds on the previous one.
 
 | Lab | Focus | What You Finish With |
 | --- | --- | --- |
-| [Lab 0](labs/lab-0-foundry-setup/lab-0_readme.md) | Foundry setup | A working local hosted agent and a validated `/responses` endpoint |
+| [Lab 0](labs/lab-0-foundry-setup/lab-0_readme.md) | Microsoft Foundry setup | A working local hosted agent and a validated `/responses` endpoint |
 | [Lab 1](labs/lab-1-copilot-config/lab-1_readme.md) | Copilot config | Repo-specific Copilot guidance for this hosted-agent project |
 | [Lab 2](labs/lab-2-implementation-shape/lab-2_readme.md) | Implementation shape | A real feature change in one of the agent's deterministic tools |
 | [Lab 3](labs/lab-3-ci/lab-3_readme.md) | CI | Build, test, and container validation in GitHub Actions |
@@ -178,7 +178,7 @@ The Bicep template in [infra/main.bicep](infra/main.bicep) provisions an Azure C
 - `AZURE_CONTAINER_REGISTRY_ENDPOINT`
 - `AZURE_RESOURCE_GROUP_NAME`
 
-You still need to set your Foundry-specific environment values in the azd environment or shell:
+You still need to set your Microsoft Foundry-specific environment values in the azd environment or shell:
 
 - `AZURE_AI_PROJECT_ENDPOINT`
 - `MODEL_DEPLOYMENT_NAME`
@@ -201,13 +201,13 @@ It uses Azure OIDC login and the recommended cloud-build path:
 - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` as GitHub secrets
 - `AZURE_CONTAINER_REGISTRY_NAME` as a GitHub repository variable, usually copied from `azd env get-values`
 
-The workflow does not create or start the Foundry hosted agent. That remains a separate step.
+The workflow does not create or start the Microsoft Foundry hosted agent. That remains a separate step.
 
-## Apply The Foundry Manifest
+## Apply The Microsoft Foundry Manifest
 
 Use this step after the image is available in ACR.
 
-Use the helper project in [src/WorkshopLab.FoundryDeployment/Program.cs](src/WorkshopLab.FoundryDeployment/Program.cs) or the wrapper script in [scripts/deploy-foundry-agent.ps1](scripts/deploy-foundry-agent.ps1) to call the Foundry manifest APIs explicitly.
+Use the helper project in [src/WorkshopLab.FoundryDeployment/Program.cs](src/WorkshopLab.FoundryDeployment/Program.cs) or the wrapper script in [scripts/deploy-foundry-agent.ps1](scripts/deploy-foundry-agent.ps1) to call the Microsoft Foundry manifest APIs explicitly.
 
 Example:
 
@@ -223,7 +223,7 @@ The wrapper reads:
 
 If `FOUNDRY_AGENT_ID` is set, the helper updates that agent from manifest. Otherwise, it creates a new agent from manifest.
 
-The helper intentionally stops after manifest create or update. Until the hosted-agent start and status control-plane surface is pinned cleanly in the SDK path, use the Foundry portal or the Foundry MCP tools for:
+The helper intentionally stops after manifest create or update. Until the hosted-agent start and status control-plane surface is pinned cleanly in the SDK path, use the Microsoft Foundry portal or the Microsoft Foundry MCP tools for:
 
 1. container start
 2. status polling
@@ -233,11 +233,11 @@ The helper intentionally stops after manifest create or update. Until the hosted
 
 This workshop separates deployment into a few clear stages so beginners can understand what happens where.
 
-- Azure prerequisites are explicit: Azure CLI auth, a Foundry project endpoint, and a deployed chat model.
+- Azure prerequisites are explicit: Azure CLI auth, a Microsoft Foundry project endpoint, and a deployed chat model.
 - The hosted agent contract is explicit in [src/WorkshopLab.AgentHost/agent.yaml](src/WorkshopLab.AgentHost/agent.yaml): `kind: hosted`, `responses` protocol, and environment-variable placeholders.
 - Azure provisioning is explicit in [azure.yaml](azure.yaml) and [infra/main.bicep](infra/main.bicep): provision the Azure resource group path and Azure Container Registry with azd.
 - CI publishing is explicit in [.github/workflows/deploy.yml](.github/workflows/deploy.yml): build a timestamped Linux AMD64 image and publish it to ACR with `az acr build`.
-- Foundry manifest deployment is explicit in [src/WorkshopLab.FoundryDeployment/Program.cs](src/WorkshopLab.FoundryDeployment/Program.cs): create or update the hosted agent from manifest as a separate control-plane step.
+- Microsoft Foundry manifest deployment is explicit in [src/WorkshopLab.FoundryDeployment/Program.cs](src/WorkshopLab.FoundryDeployment/Program.cs): create or update the hosted agent from manifest as a separate control-plane step.
 - The remaining hosted-agent lifecycle operations are environment-dependent: start the container, verify status, and test the deployed agent.
 
 That matches the Microsoft Foundry deploy skill workflow for hosted agents:
@@ -245,10 +245,10 @@ That matches the Microsoft Foundry deploy skill workflow for hosted agents:
 1. Detect the project and collect environment variables.
 2. Build a Linux AMD64 container image.
 3. Push the image to Azure Container Registry.
-4. Create or update the hosted agent definition in Foundry.
+4. Create or update the hosted agent definition in Microsoft Foundry.
 5. Start the hosted agent container and verify it reaches `Running`.
 
-The repo intentionally stops after ACR publish plus manifest apply so the remaining hosted-agent lifecycle actions stay tied to your real subscription, registry, and Foundry project.
+The repo intentionally stops after ACR publish plus manifest apply so the remaining hosted-agent lifecycle actions stay tied to your real subscription, registry, and Microsoft Foundry project.
 
 ## Notes for Hosted Agent Beginners
 

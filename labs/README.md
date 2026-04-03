@@ -14,13 +14,13 @@ Before you begin the labs, make sure the learner has access to the accounts, too
 - A GitHub account, since later labs use GitHub Actions and repository-based workflow automation.
 - Permission to create or update GitHub Actions workflows in the repo you are using for the workshop.
 
-If you are running this in a shared enterprise environment, confirm the learner knows which subscription, resource group, Foundry project, and model deployment they are expected to use before starting Lab 0.
+If you are running this in a shared enterprise environment, confirm the learner knows which subscription, resource group, Microsoft Foundry project, and model deployment they are expected to use before starting Lab 0.
 
 ## Labs
 
 | Lab | Topic | Outcome |
 | --- | --- | --- |
-| [Lab 0](lab-0-foundry-setup/lab-0_readme.md) | Foundry setup | Dev container, local run, and `/responses` validation |
+| [Lab 0](lab-0-foundry-setup/lab-0_readme.md) | Microsoft Foundry setup | Dev container, local run, and `/responses` validation |
 | [Lab 1](lab-1-copilot-config/lab-1_readme.md) | Copilot config | Repo-specific instructions and a Hosted Agent review skill |
 | [Lab 2](lab-2-implementation-shape/lab-2_readme.md) | Implementation shape | Add or improve a local tool in the hosted agent |
 | [Lab 3](lab-3-ci/lab-3_readme.md) | CI | Build, test, and container validation in GitHub Actions |
