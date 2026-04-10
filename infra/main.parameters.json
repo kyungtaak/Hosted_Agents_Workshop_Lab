@@ -9,7 +9,7 @@
       "value": "${AZURE_LOCATION}"
     },
     "containerRegistrySku": {
-      "value": "Basic"
+      "value": "Premium"
     }
   }
 }
