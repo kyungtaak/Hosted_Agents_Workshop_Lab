@@ -43,7 +43,7 @@ Write-Host ""
 python scripts/deploy_foundry_agent.py `
     --project-endpoint $ProjectEndpoint `
     --agent-name $AgentName `
-    --agent-definition $agentDefinition `
+    --image $ImageUri `
     --set "AZURE_AI_PROJECT_ENDPOINT=$ProjectEndpoint" `
     --set "MODEL_DEPLOYMENT_NAME=$ModelDeploymentName"
 

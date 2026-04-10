@@ -1,13 +1,18 @@
 """
 Foundry agent deployment helper — creates or updates a hosted agent definition
-in Microsoft Foundry using the REST API.
+in Microsoft Foundry using the Python SDK.
 
 Usage:
     python scripts/deploy_foundry_agent.py \
         --project-endpoint <endpoint> \
-        --manifest src/workshop_lab_agent_host/agent.yaml \
-        --set AZURE_AI_PROJECT_ENDPOINT=<endpoint> \
-        --set chat=gpt-4.1-mini
+        --agent-name hosted-agent-readiness-coach \
+        --image <acr-name>.azurecr.io/workshoplab-agent:lab4
+
+    Or with inline JSON definition from PowerShell wrapper:
+    python scripts/deploy_foundry_agent.py \
+        --project-endpoint <endpoint> \
+        --agent-name hosted-agent-readiness-coach \
+        --agent-definition '{"kind":"hosted",...}'
 """
 
 import argparse
@@ -15,18 +20,19 @@ import json
 import os
 import sys
 
-import yaml
+from azure.ai.projects import AIProjectClient
+from azure.ai.projects.models import HostedAgentDefinition, ProtocolVersionRecord, AgentProtocol
 from azure.identity import DefaultAzureCredential
-import requests
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Deploy a Foundry agent from manifest or definition.")
+    parser = argparse.ArgumentParser(description="Deploy a Foundry hosted agent.")
     parser.add_argument("--project-endpoint", default=os.environ.get("AZURE_AI_PROJECT_ENDPOINT"))
-    parser.add_argument("--agent-name", default=None)
-    parser.add_argument("--manifest", default=None)
+    parser.add_argument("--agent-name", default="hosted-agent-readiness-coach")
     parser.add_argument("--agent-definition", default=None)
-    parser.add_argument("--agent-id", default=os.environ.get("FOUNDRY_AGENT_ID"))
+    parser.add_argument("--image", default=None)
+    parser.add_argument("--cpu", default="1")
+    parser.add_argument("--memory", default="2Gi")
     parser.add_argument("--set", dest="replacements", action="append", default=[])
     return parser.parse_args()
 
@@ -39,62 +45,57 @@ def main():
         print("ERROR: --project-endpoint or AZURE_AI_PROJECT_ENDPOINT must be set.", file=sys.stderr)
         sys.exit(1)
 
-    # Resolve agent definition
+    # Resolve image and env vars from inline definition or CLI args
     if args.agent_definition:
         definition = json.loads(args.agent_definition)
-        agent_name = args.agent_name or "sample-hosted-agent"
-        print(f"Using provided agent definition for agent '{agent_name}'")
-    elif args.manifest:
-        with open(args.manifest, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        # Apply --set replacements
+        image = definition.get("image", args.image)
+        cpu = definition.get("cpu", args.cpu)
+        memory = definition.get("memory", args.memory)
+        env_vars = definition.get("environment_variables", {})
+    else:
+        image = args.image
+        cpu = args.cpu
+        memory = args.memory
+        env_vars = {}
         for replacement in args.replacements:
             key, _, value = replacement.partition("=")
-            if not key or not value:
-                print(f"ERROR: Invalid --set value '{replacement}'. Use NAME=VALUE.", file=sys.stderr)
-                sys.exit(1)
-            content = content.replace(f"${{{key}}}", value)
-            content = content.replace(f"{{{{{key}}}}}", value)
+            if key and value:
+                env_vars[key] = value
 
-        # Parse YAML
-        definition = yaml.safe_load(content)
-        agent_name = definition.get("name", args.agent_name or "sample-hosted-agent")
-        print(f"Using agent definition from manifest '{args.manifest}'")
-    else:
-        print("ERROR: Either --agent-definition or --manifest must be provided.", file=sys.stderr)
+    if not image:
+        print("ERROR: --image or image in --agent-definition must be provided.", file=sys.stderr)
         sys.exit(1)
 
-    agent_kind = definition.get("kind", "unknown")
-    print(f"Agent Kind: {agent_kind}")
+    if not env_vars.get("AZURE_AI_PROJECT_ENDPOINT"):
+        env_vars["AZURE_AI_PROJECT_ENDPOINT"] = project_endpoint
 
-    # Get token
-    credential = DefaultAzureCredential()
-    token = credential.get_token("https://ai.azure.com/.default").token
+    print(f"Deploying hosted agent '{args.agent_name}'")
+    print(f"  Image: {image}")
+    print(f"  Endpoint: {project_endpoint}")
 
-    endpoint = project_endpoint.rstrip("/")
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}",
-        "api-version": "2025-01-01-preview",
-    }
+    # Create project client
+    project = AIProjectClient(
+        endpoint=project_endpoint,
+        credential=DefaultAzureCredential(),
+        allow_preview=True,
+    )
 
-    if args.agent_id:
-        # Update existing agent
-        url = f"{endpoint}/agents/{args.agent_id}"
-        payload = {"definition": definition}
-        resp = requests.put(url, json=payload, headers=headers, timeout=60)
-        resp.raise_for_status()
-        print(f"Updated Foundry agent '{args.agent_id}' from definition.")
-    else:
-        # Create new agent
-        url = f"{endpoint}/agents/{agent_name}/versions"
-        payload = {"definition": definition}
-        resp = requests.post(url, json=payload, headers=headers, timeout=60)
-        resp.raise_for_status()
-        print(f"Created hosted agent '{agent_name}'.")
+    # Create a hosted agent version
+    agent = project.agents.create_version(
+        agent_name=args.agent_name,
+        definition=HostedAgentDefinition(
+            container_protocol_versions=[
+                ProtocolVersionRecord(protocol=AgentProtocol.RESPONSES, version="v1")
+            ],
+            cpu=cpu,
+            memory=memory,
+            image=image,
+            environment_variables=env_vars,
+        ),
+    )
 
-    print("Next step: start the hosted agent container and verify status in the Foundry portal or through Foundry MCP tools.")
+    print(f"Created hosted agent '{agent.name}', version: {agent.version}")
+    print("Next step: verify status in the Foundry portal or run 'azd ai agent show'.")
 
 
 if __name__ == "__main__":
